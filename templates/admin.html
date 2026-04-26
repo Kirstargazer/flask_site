@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Заявки</title>
+</head>
+<body>
+
+    <h1>Список заявок</h1>
+
+    {% for lead in leads %}
+        <p>Имя: {{ lead[0] }} | Телефон: {{ lead[1] }}</p>
+    {% endfor %}
+
+</body>
+</html>

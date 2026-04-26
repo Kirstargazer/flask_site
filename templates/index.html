@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мой сайт</title>
+</head>
+<body>
+
+    <h1>Привет 👋</h1>
+    <p>Это мой первый сайт на Flask</p>
+
+    <h2>Записаться</h2>
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <input type="text" name="name" placeholder="Имя"><br><br>
+        <input type="text" name="phone" placeholder="Телефон"><br><br>
+        <button type="submit">Отправить</button>
+    </form>
+
+</body>
+</html>

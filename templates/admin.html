@@ -7,9 +7,20 @@
 
     <h1>Список заявок</h1>
 
-    {% for lead in leads %}
-        <p>Имя: {{ lead[0] }} | Телефон: {{ lead[1] }}</p>
-    {% endfor %}
+    <table border="1">
+        <tr>
+            <th>Имя</th>
+            <th>Телефон</th>
+        </tr>
+
+        {% for lead in leads %}
+        <tr>
+            <td>{{ lead[0] }}</td>
+            <td>{{ lead[1] }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
 
 </body>
 </html>

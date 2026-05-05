@@ -1,3 +1,23 @@
-# Flask site for programming club
+# Flask Leads App 🚀
 
-This is a site that have been written with Flask framewok
+Простое веб-приложение на Flask для сбора заявок.
+
+## 🔧 Функционал
+
+- Форма записи (имя + телефон)
+- Валидация данных
+- Сохранение заявок в CSV
+- Страница "Спасибо"
+- Админка со списком заявок
+
+## 🖥️ Технологии
+
+- Python
+- Flask
+- HTML (Jinja2)
+- CSV
+
+## ▶️ Как запустить
+
+```bash
+python app.py

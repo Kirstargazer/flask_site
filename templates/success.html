@@ -1,24 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Мой сайт</title>
+    <title>Спасибо</title>
 </head>
 <body>
 
-    <h1>Привет 👋</h1>
-    <p>Это мой первый сайт на Flask</p>
+    <h1>Спасибо за заявку!</h1>
+    <p>{{ name }}, мы скоро свяжемся с вами.</p>
 
-    <h2>Записаться</h2>
-
-    {% if error %}
-        <p>{{ error }}</p>
-    {% endif %}
-
-    <form method="POST">
-        <input type="text" name="name" placeholder="Имя"><br><br>
-        <input type="text" name="phone" placeholder="Телефон"><br><br>
-        <button type="submit">Отправить</button>
-    </form>
+    <a href="/">Вернуться на главную</a>
 
 </body>
 </html>

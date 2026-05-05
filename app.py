@@ -1,5 +1,5 @@
 #Site for programming club
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import csv
 
 app = Flask(__name__)
@@ -22,9 +22,14 @@ def home():
 
         print("Сохранено:", name, phone)
 
-        return render_template("success.html", name=name)
+        return redirect(url_for("success", name=name))
 
     return render_template("index.html", error=error)
+
+@app.route("/success")
+def success():
+    name = request.args.get("name")
+    return render_template("success.html", name=name)
 
 @app.route("/admin")
 def admin():

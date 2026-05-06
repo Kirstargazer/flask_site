@@ -1,8 +1,24 @@
-#Site for programming club
 from flask import Flask, render_template, request, redirect, url_for
-import csv
+import sqlite3
 
 app = Flask(__name__)
+
+
+def init_db():
+    connection = sqlite3.connect("leads.db")
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS leads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            phone TEXT NOT NULL
+        )
+    """)
+
+    connection.commit()
+    connection.close()
+
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -16,33 +32,79 @@ def home():
             error = "Пожалуйста, заполните имя и телефон."
             return render_template("index.html", error=error)
 
-        with open("leads.csv", "a", newline="", encoding="utf-8") as file:
-            writer = csv.writer(file)
-            writer.writerow([name, phone])
+        connection = sqlite3.connect("leads.db")
+        cursor = connection.cursor()
 
-        print("Сохранено:", name, phone)
+        cursor.execute(
+            "INSERT INTO leads (name, phone) VALUES (?, ?)",
+            (name, phone)
+        )
+
+        connection.commit()
+        connection.close()
 
         return redirect(url_for("success", name=name))
 
     return render_template("index.html", error=error)
+
 
 @app.route("/success")
 def success():
     name = request.args.get("name")
     return render_template("success.html", name=name)
 
+
 @app.route("/admin")
 def admin():
-    leads = []
+    connection = sqlite3.connect("leads.db")
+    cursor = connection.cursor()
 
-    with open("leads.csv", "r", encoding="utf-8") as file:
-        reader = csv.reader(file)
+    cursor.execute("SELECT id, name, phone FROM leads")
+    leads = cursor.fetchall()
 
-        for row in reader:
-            leads.append(row)
+    connection.close()
 
     return render_template("admin.html", leads=leads)
 
+@app.route("/delete/<int:lead_id>", methods=["POST"])
+def delete_lead(lead_id):
+    connection = sqlite3.connect("leads.db")
+    cursor = connection.cursor()
+
+    cursor.execute("DELETE FROM leads WHERE id = ?", (lead_id,))
+
+    connection.commit()
+    connection.close()
+
+    return redirect(url_for("admin"))
+
+@app.route("/edit/<int:lead_id>", methods=["GET", "POST"])
+def edit_lead(lead_id):
+    connection = sqlite3.connect("leads.db")
+    cursor = connection.cursor()
+
+    if request.method == "POST":
+        name = request.form.get("name")
+        phone = request.form.get("phone")
+
+        cursor.execute(
+            "UPDATE leads SET name = ?, phone = ? WHERE id = ?",
+            (name, phone, lead_id)
+        )
+
+        connection.commit()
+        connection.close()
+
+        return redirect(url_for("admin"))
+
+    cursor.execute("SELECT id, name, phone FROM leads WHERE id = ?", (lead_id,))
+    lead = cursor.fetchone()
+
+    connection.close()
+
+    return render_template("edit.html", lead=lead)
+
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)

@@ -1,14 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Спасибо</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-    <h1>Спасибо за заявку!</h1>
-    <p>{{ name }}, мы скоро свяжемся с вами.</p>
+{% block title %}
+Спасибо
+{% endblock %}
 
-    <a href="/">Вернуться на главную</a>
+{% block content %}
 
-</body>
-</html>
+<h1>Спасибо за заявку!</h1>
+
+<p>{{ name }}, мы скоро свяжемся с вами.</p>
+
+<a href="{{ url_for('home') }}">Вернуться назад</a>
+
+{% endblock %}

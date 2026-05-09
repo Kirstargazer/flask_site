@@ -2,3 +2,4 @@ leads.csv
 leads.db
 __pycache__/
 venv/
+*.swp

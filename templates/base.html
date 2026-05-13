@@ -8,8 +8,12 @@
 <body>
 
     <nav>
-        <a href="{{ url_for('home') }}">Главная</a> |
-        <a href="{{ url_for('admin') }}">Админка</a>
+        {% if session.get("logged_in") %}
+             <a href="{{ url_for('admin') }}">Админка</a>
+             <a href="{{ url_for('logout') }}">Выйти</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Войти</a>
+        {% endif %}
     </nav>
 
     <hr>

@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
+from datetime import datetime
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = "my_secret_key_123"
 
 
 def init_db():
@@ -12,7 +14,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS leads (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            phone TEXT NOT NULL
+            phone TEXT NOT NULL,
+            created_at TEXT NOT NULL
         )
     """)
 
@@ -34,10 +37,13 @@ def home():
 
         connection = sqlite3.connect("leads.db")
         cursor = connection.cursor()
-
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
-            "INSERT INTO leads (name, phone) VALUES (?, ?)",
-            (name, phone)
+            """
+            INSERT INTO leads (name, phone, created_at)
+            VALUES (?, ?, ?)
+            """,
+            (name, phone, created_at)
         )
 
         connection.commit()
@@ -56,15 +62,42 @@ def success():
 
 @app.route("/admin")
 def admin():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
     connection = sqlite3.connect("leads.db")
     cursor = connection.cursor()
 
-    cursor.execute("SELECT id, name, phone FROM leads")
+    cursor.execute("""
+            SELECT id, name, phone, created_at
+            FROM leads
+            ORDER BY id DESC
+    """)
     leads = cursor.fetchall()
 
     connection.close()
 
     return render_template("admin.html", leads=leads)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username == "admin" and password == "12345":
+            session["logged_in"] = True
+            return redirect(url_for("admin"))
+        else:
+            error = "Неверный логин или пароль."
+
+    return render_template("login.html", error=error)
+
+@app.route("/logout")
+def logout():
+    session.pop("logged_in", None)
+    return redirect(url_for("login"))
 
 @app.route("/delete/<int:lead_id>", methods=["POST"])
 def delete_lead(lead_id):
@@ -97,7 +130,7 @@ def edit_lead(lead_id):
 
         return redirect(url_for("admin"))
 
-    cursor.execute("SELECT id, name, phone FROM leads WHERE id = ?", (lead_id,))
+    cursor.execute("SELECT id, name, phone, created_at FROM leads WHERE id = ?", (lead_id,))
     lead = cursor.fetchone()
 
     connection.close()

@@ -64,19 +64,39 @@ def success():
 def admin():
     if not session.get("logged_in"):
         return redirect(url_for("login"))
+
+    search = request.args.get("search", "")
+
     connection = sqlite3.connect("leads.db")
     cursor = connection.cursor()
 
-    cursor.execute("""
+    if search:
+        cursor.execute(
+            """
+            SELECT id, name, phone, created_at
+            FROM leads
+            WHERE name LIKE ? OR phone LIKE ?
+            ORDER BY id DESC
+            """,
+            (f"%{search}%", f"%{search}%")
+        )
+    else:
+        cursor.execute(
+            """
             SELECT id, name, phone, created_at
             FROM leads
             ORDER BY id DESC
-    """)
-    leads = cursor.fetchall()
+            """
+        )
 
+    leads = cursor.fetchall()
     connection.close()
 
-    return render_template("admin.html", leads=leads)
+    return render_template(
+        "admin.html",
+        leads=leads,
+        search=search
+    )
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
